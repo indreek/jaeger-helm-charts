@@ -18,9 +18,16 @@ fullnameOverride: ""
 
 allInOne:
   enabled: false
+  replicas: 1
   image: jaegertracing/all-in-one
   pullPolicy: IfNotPresent
   extraEnv: []
+  extraSecretMounts: []
+    # - name: jaeger-tls
+    #   mountPath: /tls
+    #   subPath: ""
+    #   secretName: jaeger-tls
+    #   readOnly: true
   # command line arguments / CLI flags
   # See https://www.jaegertracing.io/docs/cli/
   args: []
@@ -33,6 +40,12 @@ allInOne:
   #   }
   service:
     headless: true
+    collector:
+      otlp:
+        grpc:
+          name: otlp-grpc
+        http:
+          name: otlp-http
   ingress:
     enabled: false
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
@@ -244,6 +257,8 @@ ingester:
   podLabels: {}
   extraSecretMounts: []
   extraConfigmapMounts: []
+  extraEnv: []
+  envFrom: []
 
   serviceMonitor:
     enabled: false
@@ -316,6 +331,7 @@ agent:
   #   subPath: ""
   #   configMap: jaeger-config
   #   readOnly: true
+  envFrom: []
   useHostNetwork: false
   dnsPolicy: ClusterFirst
   priorityClassName: ""
@@ -341,6 +357,7 @@ collector:
   pullPolicy: IfNotPresent
   dnsPolicy: ClusterFirst
   extraEnv: []
+  envFrom: []
   cmdlineParams: {}
   basePath: /
   replicaCount: 1
@@ -373,9 +390,11 @@ collector:
       # nodePort:
     otlp:
       grpc: {}
+        # name: otlp-grpc
         # port: 4317
         # nodePort:
       http: {}
+        # name: otlp-http
         # port: 4318
         # nodePort:
   ingress:
@@ -531,6 +550,7 @@ query:
   dnsPolicy: ClusterFirst
   cmdlineParams: {}
   extraEnv: []
+  envFrom: []
   replicaCount: 1
   service:
     annotations: {}
